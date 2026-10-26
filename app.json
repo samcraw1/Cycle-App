@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "Cycle",
+    "slug": "cycle-app",
+    "version": "0.1.0",
+    "scheme": "cycleapp",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "com.samcraw1.cycleapp",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.samcraw1.cycleapp",
+      "adaptiveIcon": {
+        "backgroundColor": "#F6F1EC",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router",
+      ["expo-sqlite", { "useSQLCipher": true }],
+      "expo-secure-store",
+      ["expo-local-authentication", { "faceIDPermission": "Unlock Cycle with Face ID." }],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "resizeMode": "contain",
+          "backgroundColor": "#F6F1EC",
+          "dark": { "backgroundColor": "#1C1917" }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
