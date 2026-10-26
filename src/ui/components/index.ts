@@ -8,3 +8,5 @@ export * from './Stepper';
 export * from './Text';
 export * from './OnboardingFrame';
 export * from './Section';
+export * from './BarChart';
+export * from './Row';

@@ -1,6 +1,8 @@
 import { createRepositories, openDatabase, type Repositories } from '@/db';
 import { track } from '@/services/analytics';
-import { initializeLock, useCycleStore, useSettingsStore } from '@/store';
+import { createMockEntitlements } from '@/services/entitlements';
+import { configureNotificationHandler } from '@/services/notifications';
+import { initializeLock, useCycleStore, useEntitlementsStore, useSettingsStore } from '@/store';
 
 let repos: Repositories | null = null;
 
@@ -14,6 +16,9 @@ export async function bootstrap(): Promise<Repositories> {
     useCycleStore.getState().load(repos),
   ]);
   initializeLock(useSettingsStore.getState().values.app_lock_enabled);
+  configureNotificationHandler();
+  if (!useEntitlementsStore.getState().premium)
+    await useEntitlementsStore.getState().attach(createMockEntitlements());
   track('app_open');
   return repos;
 }

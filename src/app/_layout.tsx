@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { bootstrap } from '@/services/bootstrap';
+import { useReminderSync } from '@/services/useReminderSync';
 import { Button, LockGate, Text } from '@/ui/components';
 import { useTheme } from '@/ui/theme';
 
@@ -50,6 +51,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      <ReminderSync />
       <LockGate>
         <Stack
           screenOptions={{
@@ -75,6 +77,11 @@ export default function RootLayout() {
       </LockGate>
     </SafeAreaProvider>
   );
+}
+
+function ReminderSync() {
+  useReminderSync();
+  return null;
 }
 
 const styles = StyleSheet.create({
