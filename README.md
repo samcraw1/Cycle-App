@@ -38,10 +38,20 @@ src/content/    symptom catalog, copy
 - Analytics events are a closed TypeScript union whose props can only be literal values. A health field cannot compile.
 - See `PRIVACY.md` (Phase 5) for the plain-English summary.
 
+## Subscriptions (RevenueCat)
+
+Without keys the app uses a mock entitlements service (purchases succeed instantly; a dev toggle in Settings flips premium). To use RevenueCat:
+
+1. In the RevenueCat dashboard create an entitlement with identifier `premium`.
+2. Create an offering (set as current) with a **monthly** and an **annual** package pointing at your App Store Connect products.
+3. Copy `.env.example` to `.env` and set `EXPO_PUBLIC_RC_IOS_KEY` (public SDK key). Rebuild the dev client.
+
+RevenueCat receives only an anonymous app user id and purchase state. No health data is ever sent.
+
 ## Status
 
 - [x] Phase 1: foundation (encrypted DB, migrations, app lock, navigation shell, theme)
 - [ ] Phase 2: onboarding, logging, calendar, prediction engine, home
 - [x] Phase 3: insights, reminders, export/delete
-- [ ] Phase 4: RevenueCat paywall, premium report
+- [x] Phase 4: RevenueCat paywall, premium report
 - [ ] Phase 5: polish, accessibility, PRIVACY.md
