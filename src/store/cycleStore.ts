@@ -84,6 +84,5 @@ export const useCycleStore = create<CycleState>((set, get) => ({
   },
 }));
 
-/** Symptoms shown when logging. */
-export const selectActiveSymptoms = (s: { symptoms: Symptom[] }) =>
-  s.symptoms.filter((x) => x.isActive);
+/** Symptoms shown when logging. Returns a new array; call inside useMemo. */
+export const activeSymptoms = (symptoms: readonly Symptom[]) => symptoms.filter((x) => x.isActive);

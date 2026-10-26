@@ -7,7 +7,7 @@ import type { SymptomCategory } from '@/content/symptoms';
 import { FLOWS, MOODS, type Flow, type Mood } from '@/db';
 import { isIsoDate, today } from '@/domain/dates';
 import { getRepos } from '@/services/bootstrap';
-import { selectActiveSymptoms, useCycleStore, useEntitlementsStore } from '@/store';
+import { useCycleStore, useEntitlementsStore } from '@/store';
 import { Button, Chip, Screen, Section, Text } from '@/ui/components';
 import { formatDayLong } from '@/ui/format';
 import { TAP_TARGET, useTheme } from '@/ui/theme';
@@ -36,7 +36,8 @@ export default function LogScreen() {
     date ? s.periodDays.find((p) => p.date === date) : undefined,
   );
   const log = useCycleStore((s) => (date ? s.dayLogs[date] : undefined));
-  const symptoms = useCycleStore(selectActiveSymptoms);
+  const allSymptoms = useCycleStore((s) => s.symptoms);
+  const symptoms = useMemo(() => allSymptoms.filter((s) => s.isActive), [allSymptoms]);
   const premium = useEntitlementsStore((s) => s.premium);
   const { setPeriodDay, removePeriodDay, saveDayLog, addCustomSymptom } = useCycleStore();
 

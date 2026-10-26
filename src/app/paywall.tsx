@@ -66,7 +66,6 @@ export default function PaywallScreen() {
       const ok = await service.restore();
       if (ok) {
         track('purchase_restored');
-        router.back();
       } else {
         Alert.alert('Nothing to restore', 'No active subscription was found for this Apple ID.');
       }
