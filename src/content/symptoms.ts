@@ -18,7 +18,6 @@ export const CORE_SYMPTOMS: readonly SymptomSeed[] = [
   { id: 'back_pain', label: 'Back pain', category: 'physical' },
   { id: 'fatigue', label: 'Fatigue', category: 'physical' },
   { id: 'nausea', label: 'Nausea', category: 'physical' },
-  { id: 'spotting', label: 'Spotting', category: 'physical' },
   { id: 'discharge', label: 'Discharge', category: 'physical' },
   { id: 'cravings', label: 'Cravings', category: 'metabolic' },
   { id: 'insomnia', label: 'Trouble sleeping', category: 'other' },

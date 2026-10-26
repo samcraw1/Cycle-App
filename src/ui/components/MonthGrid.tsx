@@ -128,7 +128,7 @@ export function MonthGrid({
                 accessibilityRole="button"
                 accessibilityLabel={parts.join(', ')}
                 accessibilityState={{ disabled, selected: isSelected }}
-                style={[styles.cell, { opacity: disabled ? 0.4 : 1 }]}
+                style={[styles.cell, { opacity: disabled ? 0.55 : 1 }]}
               >
                 <View
                   style={[
