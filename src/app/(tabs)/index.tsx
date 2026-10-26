@@ -72,6 +72,7 @@ export default function HomeScreen() {
           <View
             style={{
               flexDirection: 'row',
+              flexWrap: 'wrap',
               alignItems: 'center',
               gap: spacing.sm,
               marginBottom: spacing.sm,
