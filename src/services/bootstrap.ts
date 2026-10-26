@@ -1,6 +1,6 @@
 import { createRepositories, openDatabase, type Repositories } from '@/db';
 import { track } from '@/services/analytics';
-import { initializeLock, useSettingsStore } from '@/store';
+import { initializeLock, useCycleStore, useSettingsStore } from '@/store';
 
 let repos: Repositories | null = null;
 
@@ -9,7 +9,10 @@ export async function bootstrap(): Promise<Repositories> {
   if (repos) return repos;
   const db = await openDatabase();
   repos = createRepositories(db);
-  await useSettingsStore.getState().hydrate(repos.settings);
+  await Promise.all([
+    useSettingsStore.getState().hydrate(repos.settings),
+    useCycleStore.getState().load(repos),
+  ]);
   initializeLock(useSettingsStore.getState().values.app_lock_enabled);
   track('app_open');
   return repos;
@@ -24,4 +27,5 @@ export function getRepos(): Repositories {
 export function resetBootstrap(): void {
   repos = null;
   useSettingsStore.getState().reset();
+  useCycleStore.getState().reset();
 }
