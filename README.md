@@ -1,21 +1,47 @@
-# Cycle-App
+# Cycle
 
-Cycle-App is in early development. This repository will hold the app's source code, setup instructions, and documentation as the project takes shape.
+A privacy-first period tracker for people with PCOS and irregular cycles.
+All health data stays on the device in an encrypted SQLite database. No accounts, no cloud, no ads.
 
-## Getting started
+## Stack
 
-Clone the repo:
+Expo SDK 58 · React Native · TypeScript (strict) · Expo Router · expo-sqlite (SQLCipher) · Zustand · date-fns · Jest
+
+## Setup
 
 ```bash
-git clone https://github.com/samcraw1/Cycle-App.git
-cd Cycle-App
+npm install
+npm run ios        # builds a dev client; required for SQLCipher + Face ID (Expo Go is not supported)
 ```
 
-Setup and run instructions will be added once the project is scaffolded.
+```bash
+npm run check      # typecheck + lint + tests
+npm test
+```
+
+## Layout
+
+```
+src/app/        Expo Router screens (thin)
+src/db/         encrypted DB, migrations, repositories
+src/domain/     pure logic: dates, cycles, prediction, insights (unit-tested)
+src/services/   analytics (typed no-op), entitlements, lock, notifications, export
+src/store/      zustand stores
+src/ui/         theme tokens + components
+src/content/    symptom catalog, copy
+```
+
+## Privacy architecture
+
+- Database key: 256-bit random, generated on first launch, stored in Keychain/Keystore as this-device-only.
+- `PRAGMA cipher_version` is checked at boot; production builds refuse to run unencrypted.
+- Analytics events are a closed TypeScript union whose props can only be literal values. A health field cannot compile.
+- See `PRIVACY.md` (Phase 5) for the plain-English summary.
 
 ## Status
 
-- [ ] Project scaffold
-- [ ] Core features
-- [ ] Tests
-- [ ] Deployment
+- [x] Phase 1: foundation (encrypted DB, migrations, app lock, navigation shell, theme)
+- [ ] Phase 2: onboarding, logging, calendar, prediction engine, home
+- [ ] Phase 3: insights, reminders, export/delete
+- [ ] Phase 4: RevenueCat paywall, premium report
+- [ ] Phase 5: polish, accessibility, PRIVACY.md
