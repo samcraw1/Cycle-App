@@ -24,7 +24,7 @@ export function escapeHtml(s: string): string {
 }
 
 const DISCLAIMER =
-  'This report is a summary of self-logged data from the Cycle app. It is not a medical record, diagnosis, or advice. Cycle phases are estimates based on average cycle timing.';
+  'This report is a summary of self-logged data from the Cycle app. It is not a medical record, diagnosis, or advice. Cycle phases are estimates based on average cycle timing and must not be used for birth control.';
 
 const fmt = (n: number | null, unit = '') => (n === null ? '–' : `${n}${unit}`);
 

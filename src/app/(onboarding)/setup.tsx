@@ -7,6 +7,7 @@ import { authenticate } from '@/services/lock/biometrics';
 import { completeOnboarding } from '@/services/onboarding';
 import { useOnboardingStore } from '@/store';
 import { Card, OnboardingFrame, Text } from '@/ui/components';
+import { safely } from '@/ui/safely';
 import { TAP_TARGET, useTheme } from '@/ui/theme';
 
 function Row({
@@ -93,7 +94,7 @@ export default function SetupStep() {
           title="App Lock"
           caption="Require Face ID, Touch ID, or passcode to open."
           value={draft.appLock}
-          onChange={(v) => void toggleLock(v)}
+          onChange={(v) => safely(toggleLock(v))}
         />
       </Card>
       <Card>

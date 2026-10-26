@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, type ErrorBoundaryProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
@@ -13,7 +13,7 @@ import { useTheme } from '@/ui/theme';
 void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const { colors, scheme, spacing } = useTheme();
+  const { colors, scheme } = useTheme();
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -26,23 +26,16 @@ export default function RootLayout() {
 
   if (error) {
     return (
-      <View style={[styles.center, { backgroundColor: colors.background, padding: spacing.lg }]}>
-        <Text variant="title" style={{ marginBottom: spacing.sm }}>
-          Something went wrong
-        </Text>
-        <Text muted style={{ textAlign: 'center', marginBottom: spacing.lg }}>
-          {error.message}
-        </Text>
-        <Button
-          title="Try again"
-          onPress={() => {
-            setError(null);
-            bootstrap()
-              .then(() => setReady(true))
-              .catch((e: unknown) => setError(e instanceof Error ? e : new Error(String(e))));
-          }}
-        />
-      </View>
+      <FatalScreen
+        title="Could not open your data"
+        message={error.message}
+        onRetry={() => {
+          setError(null);
+          bootstrap()
+            .then(() => setReady(true))
+            .catch((e: unknown) => setError(e instanceof Error ? e : new Error(String(e))));
+        }}
+      />
     );
   }
 
@@ -84,6 +77,45 @@ export default function RootLayout() {
         </Stack>
       </LockGate>
     </SafeAreaProvider>
+  );
+}
+
+/** Catches render errors anywhere in the tree. Data is safe: nothing is lost on a crash. */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  return (
+    <FatalScreen
+      title="Something went wrong"
+      message={error.message}
+      onRetry={() => void retry()}
+    />
+  );
+}
+
+function FatalScreen({
+  title,
+  message,
+  onRetry,
+}: {
+  title: string;
+  message: string;
+  onRetry(): void;
+}) {
+  const { colors, spacing } = useTheme();
+  return (
+    <View style={[styles.center, { backgroundColor: colors.background, padding: spacing.lg }]}>
+      <Text variant="title" style={{ marginBottom: spacing.sm }}>
+        {title}
+      </Text>
+      <Text muted style={{ textAlign: 'center', marginBottom: spacing.sm }}>
+        Your data is safe on this phone. Try again, or restart the app.
+      </Text>
+      {__DEV__ ? (
+        <Text variant="caption" muted style={{ textAlign: 'center', marginBottom: spacing.lg }}>
+          {message}
+        </Text>
+      ) : null}
+      <Button title="Try again" onPress={onRetry} />
+    </View>
   );
 }
 

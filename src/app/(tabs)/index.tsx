@@ -8,6 +8,7 @@ import { RED_FLAG_COPY } from '@/domain/prediction';
 import { getRepos } from '@/services/bootstrap';
 import { summarizeCycles, useCycleStore, useSettingsStore } from '@/store';
 import { Button, Card, Screen, Text } from '@/ui/components';
+import { safely } from '@/ui/safely';
 import { formatDayLong, formatRange } from '@/ui/format';
 import { useTheme } from '@/ui/theme';
 
@@ -26,7 +27,7 @@ export default function HomeScreen() {
   const { current, prediction, redFlags } = summary;
   const todayPeriod = periodDays.find((p) => p.date === now);
 
-  const startPeriodToday = () => void setPeriodDay(getRepos(), { date: now, flow: 'medium' });
+  const startPeriodToday = () => safely(setPeriodDay(getRepos(), { date: now, flow: 'medium' }));
 
   return (
     <Screen scroll>
@@ -100,7 +101,14 @@ export default function HomeScreen() {
         </Card>
       ) : null}
 
-      <View style={{ flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.md }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: spacing.sm,
+          marginBottom: spacing.md,
+        }}
+      >
         {current && !todayPeriod ? (
           <Button title="Period started" variant="secondary" onPress={startPeriodToday} />
         ) : null}

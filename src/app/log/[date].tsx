@@ -10,6 +10,7 @@ import { getRepos } from '@/services/bootstrap';
 import { useCycleStore, useEntitlementsStore } from '@/store';
 import { Button, Chip, Screen, Section, Text } from '@/ui/components';
 import { formatDayLong } from '@/ui/format';
+import { safely } from '@/ui/safely';
 import { TAP_TARGET, useTheme } from '@/ui/theme';
 
 const MOOD_LABEL: Record<Mood, string> = {
@@ -80,27 +81,31 @@ export default function LogScreen() {
   const repos = getRepos();
 
   const setFlow = (flow: Flow | null) =>
-    flow ? void setPeriodDay(repos, { date, flow }) : void removePeriodDay(repos, date);
+    safely(flow ? setPeriodDay(repos, { date, flow }) : removePeriodDay(repos, date));
   const toggleSymptom = (id: string) => {
     const ids = current.symptomIds.includes(id)
       ? current.symptomIds.filter((x) => x !== id)
       : [...current.symptomIds, id];
-    void saveDayLog(repos, { ...current, symptomIds: ids });
+    safely(saveDayLog(repos, { ...current, symptomIds: ids }));
   };
   const setMood = (mood: Mood) =>
-    void saveDayLog(repos, { ...current, mood: current.mood === mood ? null : mood });
+    safely(saveDayLog(repos, { ...current, mood: current.mood === mood ? null : mood }));
   const commitNotes = () => {
     const trimmed = notes.trim();
     if ((current.notes ?? '') !== trimmed)
-      void saveDayLog(repos, { ...current, notes: trimmed || null });
+      safely(saveDayLog(repos, { ...current, notes: trimmed || null }));
   };
-  const addCustom = async () => {
-    const label = custom.trim();
-    if (!label) return;
-    const s = await addCustomSymptom(repos, label, premium ? customCategory : 'other');
-    setCustom('');
-    void saveDayLog(repos, { ...current, symptomIds: [...current.symptomIds, s.id] });
-  };
+  const addCustom = () =>
+    safely(
+      (async () => {
+        const label = custom.trim();
+        if (!label) return;
+        const s = await addCustomSymptom(repos, label, premium ? customCategory : 'other');
+        setCustom('');
+        await saveDayLog(repos, { ...current, symptomIds: [...current.symptomIds, s.id] });
+      })(),
+      'Could not add symptom',
+    );
 
   return (
     <Screen scroll edges={['left', 'right', 'bottom']}>
@@ -154,7 +159,7 @@ export default function LogScreen() {
           <TextInput
             value={custom}
             onChangeText={setCustom}
-            onSubmitEditing={() => void addCustom()}
+            onSubmitEditing={addCustom}
             placeholder="e.g. Night sweats"
             placeholderTextColor={colors.textMuted}
             accessibilityLabel="New symptom name"
@@ -172,12 +177,7 @@ export default function LogScreen() {
               fontSize: 16,
             }}
           />
-          <Button
-            title="Add"
-            variant="secondary"
-            onPress={() => void addCustom()}
-            disabled={!custom.trim()}
-          />
+          <Button title="Add" variant="secondary" onPress={addCustom} disabled={!custom.trim()} />
         </View>
         {premium ? (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm }}>

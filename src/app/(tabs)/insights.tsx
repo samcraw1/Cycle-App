@@ -7,7 +7,6 @@ import { today } from '@/domain/dates';
 import {
   cycleStats,
   PHASE_COPY,
-  PHASES,
   symptomsByPhase,
   topSymptoms,
   VARIABILITY_COPY,
@@ -19,6 +18,7 @@ import { shareDoctorReport } from '@/services/report';
 import { summarizeCycles, useCycleStore, useEntitlementsStore, useSettingsStore } from '@/store';
 import { BarChart, Button, Card, Screen, Section, Text } from '@/ui/components';
 import { formatDay } from '@/ui/format';
+import { safely } from '@/ui/safely';
 import { useTheme } from '@/ui/theme';
 
 export default function InsightsScreen() {
@@ -154,13 +154,13 @@ export default function InsightsScreen() {
               </View>
             ))}
             <Text variant="caption" muted style={{ marginBottom: spacing.md }}>
-              Phases are estimates from average cycle timing, not measurements. {PHASES.length}{' '}
-              phases: period, follicular, around ovulation, luteal.
+              Phases are estimates from average cycle timing, not measurements. They are not a
+              fertility method and must not be used for birth control.
             </Text>
             <Button
               title="Create doctor-ready report"
               variant="secondary"
-              onPress={() => void shareDoctorReport(getRepos())}
+              onPress={() => safely(shareDoctorReport(getRepos()), 'Report failed')}
             />
           </Card>
         ) : (

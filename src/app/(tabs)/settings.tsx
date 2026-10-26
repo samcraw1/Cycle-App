@@ -12,6 +12,7 @@ import { authenticate, getLockCapability, type LockCapability } from '@/services
 import { getPermission, requestPermission } from '@/services/notifications';
 import { useEntitlementsStore, useLockStore, useSettingsStore } from '@/store';
 import { Card, Chip, Row, Screen, Section, Text } from '@/ui/components';
+import { safely } from '@/ui/safely';
 import { useTheme } from '@/ui/theme';
 
 const TIMES = ['08:00', '12:00', '18:00', '20:00', '21:30'];
@@ -154,7 +155,7 @@ export default function SettingsScreen() {
           <Row
             title="App Lock"
             caption={`Require ${lockLabel} to open the app.`}
-            right={sw(values.app_lock_enabled, (v) => void toggleLock(v), 'App Lock')}
+            right={sw(values.app_lock_enabled, (v) => safely(toggleLock(v)), 'App Lock')}
           />
           <Row
             title="How your data is handled"
@@ -172,7 +173,7 @@ export default function SettingsScreen() {
             caption="The day before your expected range, at 9:00."
             right={sw(
               values.reminder_period_enabled,
-              (v) => void toggleReminder('reminder_period_enabled', v),
+              (v) => safely(toggleReminder('reminder_period_enabled', v)),
               'Period reminder',
             )}
           />
@@ -181,7 +182,7 @@ export default function SettingsScreen() {
             caption="A gentle nudge to log the day."
             right={sw(
               values.reminder_daily_log_enabled,
-              (v) => void toggleReminder('reminder_daily_log_enabled', v),
+              (v) => safely(toggleReminder('reminder_daily_log_enabled', v)),
               'Daily log reminder',
             )}
           >
@@ -192,7 +193,7 @@ export default function SettingsScreen() {
                     key={t}
                     label={t}
                     selected={values.reminder_daily_log_time === t}
-                    onPress={() => void setSetting(repos(), 'reminder_daily_log_time', t)}
+                    onPress={() => safely(setSetting(repos(), 'reminder_daily_log_time', t))}
                   />
                 ))}
               </View>
@@ -203,7 +204,7 @@ export default function SettingsScreen() {
             caption="Reminders never mention periods or symptoms on the lock screen."
             right={sw(
               values.reminder_discreet,
-              (v) => void setSetting(repos(), 'reminder_discreet', v),
+              (v) => safely(setSetting(repos(), 'reminder_discreet', v)),
               'Discreet wording',
             )}
           />

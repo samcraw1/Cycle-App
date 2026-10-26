@@ -6,6 +6,7 @@ import { CATEGORY_LABEL, CATEGORY_ORDER } from '@/content/categories';
 import { getRepos } from '@/services/bootstrap';
 import { useCycleStore, useEntitlementsStore } from '@/store';
 import { Button, Card, Row, Screen, Section, Text } from '@/ui/components';
+import { safely } from '@/ui/safely';
 import { useTheme } from '@/ui/theme';
 
 export default function ManageSymptomsScreen() {
@@ -42,7 +43,11 @@ export default function ManageSymptomsScreen() {
   const confirmDelete = (id: string, label: string) =>
     Alert.alert(`Delete “${label}”?`, 'Days where you logged it will lose that entry.', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => void remove(getRepos(), id) },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => safely(remove(getRepos(), id), 'Could not delete'),
+      },
     ]);
 
   return (
@@ -70,7 +75,7 @@ export default function ManageSymptomsScreen() {
                     ) : null}
                     <Switch
                       value={s.isActive}
-                      onValueChange={(v) => void setActive(getRepos(), s.id, v)}
+                      onValueChange={(v) => safely(setActive(getRepos(), s.id, v))}
                       accessibilityLabel={`Show ${s.label} when logging`}
                       trackColor={{ true: colors.accent }}
                     />
