@@ -42,6 +42,6 @@ src/content/    symptom catalog, copy
 
 - [x] Phase 1: foundation (encrypted DB, migrations, app lock, navigation shell, theme)
 - [ ] Phase 2: onboarding, logging, calendar, prediction engine, home
-- [ ] Phase 3: insights, reminders, export/delete
+- [x] Phase 3: insights, reminders, export/delete
 - [ ] Phase 4: RevenueCat paywall, premium report
 - [ ] Phase 5: polish, accessibility, PRIVACY.md

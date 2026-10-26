@@ -1,6 +1,7 @@
 import type { Repositories } from '@/db';
 import { addDays } from '@/domain/dates';
 import { track } from '@/services/analytics';
+import { requestPermission } from '@/services/notifications';
 import { useCycleStore, useLockStore, useSettingsStore, type OnboardingDraft } from '@/store';
 
 const MAX_SEEDED_PERIOD_DAYS = 10;
@@ -29,6 +30,11 @@ export async function completeOnboarding(
     for (let i = 0; i < n; i += 1) {
       await cycle.setPeriodDay(repos, { date: addDays(draft.lastPeriodStart, i), flow: 'medium' });
     }
+  }
+
+  if (draft.periodReminder || draft.dailyReminder) {
+    // Ask now so reminders the user just opted into can actually fire.
+    await requestPermission().catch(() => undefined);
   }
 
   await settings.set(s, 'onboarding_complete', true);

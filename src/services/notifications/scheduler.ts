@@ -92,6 +92,11 @@ export async function applyReminderPlan(plans: readonly ReminderPlan[]): Promise
   );
   if (plans.length === 0) return;
   if ((await getPermission()) !== 'granted') return;
+  if (__DEV__)
+    console.log(
+      '[reminders] scheduling',
+      plans.map((p) => `${p.id}@${JSON.stringify(p.trigger)}`).join(' '),
+    );
   for (const plan of plans) {
     await Notifications.scheduleNotificationAsync({
       identifier: plan.id,

@@ -21,6 +21,7 @@ interface BarChartProps {
 const PAD_TOP = 18;
 const PAD_BOTTOM = 22;
 const GAP = 6;
+const MAX_BAR_W = 56;
 
 export function BarChart({
   data,
@@ -38,7 +39,9 @@ export function BarChart({
   const min = 0;
   const plotH = height - PAD_TOP - PAD_BOTTOM;
   const y = (v: number) => PAD_TOP + plotH - ((v - min) / (max - min)) * plotH;
-  const barW = data.length ? Math.max(4, (width - GAP * (data.length - 1)) / data.length) : 0;
+  const barW = data.length
+    ? Math.min(MAX_BAR_W, Math.max(4, (width - GAP * (data.length - 1)) / data.length))
+    : 0;
 
   return (
     <View

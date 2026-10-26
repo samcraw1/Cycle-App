@@ -73,6 +73,10 @@ export default function RootLayout() {
             name="paywall"
             options={{ presentation: 'modal', headerShown: true, title: 'Premium' }}
           />
+          <Stack.Screen
+            name="privacy"
+            options={{ presentation: 'modal', headerShown: true, title: 'Privacy' }}
+          />
         </Stack>
       </LockGate>
     </SafeAreaProvider>
