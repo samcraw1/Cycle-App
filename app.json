@@ -7,7 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "bundleIdentifier": "com.samcraw1.cycleapp",
       "supportsTablet": false,
@@ -27,9 +26,19 @@
     },
     "plugins": [
       "expo-router",
-      ["expo-sqlite", { "useSQLCipher": true }],
+      [
+        "expo-sqlite",
+        {
+          "useSQLCipher": true
+        }
+      ],
       "expo-secure-store",
-      ["expo-local-authentication", { "faceIDPermission": "Unlock Cycle with Face ID." }],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Unlock Cycle with Face ID."
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -37,9 +46,12 @@
           "imageWidth": 160,
           "resizeMode": "contain",
           "backgroundColor": "#F6F1EC",
-          "dark": { "backgroundColor": "#1C1917" }
+          "dark": {
+            "backgroundColor": "#1C1917"
+          }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
