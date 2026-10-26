@@ -1,10 +1,15 @@
 import { createRepositories, openDatabase, type Repositories } from '@/db';
 import { track } from '@/services/analytics';
-import { createMockEntitlements } from '@/services/entitlements';
+import {
+  createMockEntitlements,
+  createRevenueCatEntitlements,
+  getRevenueCatApiKey,
+} from '@/services/entitlements';
 import { configureNotificationHandler } from '@/services/notifications';
 import { initializeLock, useCycleStore, useEntitlementsStore, useSettingsStore } from '@/store';
 
 let repos: Repositories | null = null;
+let entitlementsAttached = false;
 
 /** Opens the encrypted DB, hydrates settings, and arms the app lock. Idempotent. */
 export async function bootstrap(): Promise<Repositories> {
@@ -18,7 +23,13 @@ export async function bootstrap(): Promise<Repositories> {
   initializeLock(useSettingsStore.getState().values.app_lock_enabled);
   configureNotificationHandler();
   if (!useEntitlementsStore.getState().premium)
-    await useEntitlementsStore.getState().attach(createMockEntitlements());
+    if (!entitlementsAttached) {
+      entitlementsAttached = true;
+      const key = getRevenueCatApiKey();
+      await useEntitlementsStore
+        .getState()
+        .attach(key ? createRevenueCatEntitlements(key) : createMockEntitlements());
+    }
   track('app_open');
   return repos;
 }

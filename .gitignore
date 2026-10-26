@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# RevenueCat public keys (copy .env.example)
+.env
