@@ -17,6 +17,8 @@ interface CycleState {
   removePeriodDay(repos: Repositories, date: IsoDate): Promise<void>;
   saveDayLog(repos: Repositories, log: DayLog): Promise<void>;
   addCustomSymptom(repos: Repositories, label: string, category: SymptomCategory): Promise<Symptom>;
+  setSymptomActive(repos: Repositories, id: string, active: boolean): Promise<void>;
+  deleteCustomSymptom(repos: Repositories, id: string): Promise<void>;
   reset(): void;
 }
 
@@ -29,7 +31,7 @@ export const useCycleStore = create<CycleState>((set, get) => ({
     const [periodDays, logs, symptoms] = await Promise.all([
       repos.periodDays.listAll(),
       repos.dayLogs.listBetween(ALL_START, ALL_END),
-      repos.symptoms.listActive(),
+      repos.symptoms.listAll(),
     ]);
     const dayLogs: Record<string, DayLog> = {};
     for (const l of logs) dayLogs[l.date] = l;
@@ -62,7 +64,26 @@ export const useCycleStore = create<CycleState>((set, get) => ({
     return symptom;
   },
 
+  async setSymptomActive(repos, id, active) {
+    await repos.symptoms.setActive(id, active);
+    set({ symptoms: get().symptoms.map((s) => (s.id === id ? { ...s, isActive: active } : s)) });
+  },
+
+  async deleteCustomSymptom(repos, id) {
+    await repos.symptoms.deleteCustom(id);
+    const dayLogs = { ...get().dayLogs };
+    for (const [date, log] of Object.entries(dayLogs)) {
+      if (log.symptomIds.includes(id))
+        dayLogs[date] = { ...log, symptomIds: log.symptomIds.filter((x) => x !== id) };
+    }
+    set({ symptoms: get().symptoms.filter((s) => s.id !== id), dayLogs });
+  },
+
   reset() {
     set(initial);
   },
 }));
+
+/** Symptoms shown when logging. */
+export const selectActiveSymptoms = (s: { symptoms: Symptom[] }) =>
+  s.symptoms.filter((x) => x.isActive);

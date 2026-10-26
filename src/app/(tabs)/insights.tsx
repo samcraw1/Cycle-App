@@ -14,6 +14,8 @@ import {
   variabilityLabel,
 } from '@/domain/insights';
 import { track } from '@/services/analytics';
+import { getRepos } from '@/services/bootstrap';
+import { shareDoctorReport } from '@/services/report';
 import { summarizeCycles, useCycleStore, useEntitlementsStore, useSettingsStore } from '@/store';
 import { BarChart, Button, Card, Screen, Section, Text } from '@/ui/components';
 import { formatDay } from '@/ui/format';
@@ -151,10 +153,15 @@ export default function InsightsScreen() {
                 )}
               </View>
             ))}
-            <Text variant="caption" muted>
+            <Text variant="caption" muted style={{ marginBottom: spacing.md }}>
               Phases are estimates from average cycle timing, not measurements. {PHASES.length}{' '}
               phases: period, follicular, around ovulation, luteal.
             </Text>
+            <Button
+              title="Create doctor-ready report"
+              variant="secondary"
+              onPress={() => void shareDoctorReport(getRepos())}
+            />
           </Card>
         ) : (
           <Card style={{ backgroundColor: colors.accentSoft, borderColor: colors.accentSoft }}>

@@ -77,6 +77,10 @@ export default function RootLayout() {
             name="privacy"
             options={{ presentation: 'modal', headerShown: true, title: 'Privacy' }}
           />
+          <Stack.Screen
+            name="symptoms"
+            options={{ presentation: 'modal', headerShown: true, title: 'Symptoms' }}
+          />
         </Stack>
       </LockGate>
     </SafeAreaProvider>

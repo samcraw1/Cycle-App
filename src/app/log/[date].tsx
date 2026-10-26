@@ -2,23 +2,16 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { TextInput, View } from 'react-native';
 
+import { CATEGORY_LABEL, CATEGORY_ORDER } from '@/content/categories';
 import type { SymptomCategory } from '@/content/symptoms';
 import { FLOWS, MOODS, type Flow, type Mood } from '@/db';
 import { isIsoDate, today } from '@/domain/dates';
 import { getRepos } from '@/services/bootstrap';
-import { useCycleStore } from '@/store';
+import { selectActiveSymptoms, useCycleStore, useEntitlementsStore } from '@/store';
 import { Button, Chip, Screen, Section, Text } from '@/ui/components';
 import { formatDayLong } from '@/ui/format';
 import { TAP_TARGET, useTheme } from '@/ui/theme';
 
-const CATEGORY_LABEL: Record<SymptomCategory, string> = {
-  physical: 'Physical',
-  mood: 'Mind',
-  skin_hair: 'Skin & hair',
-  metabolic: 'Energy & appetite',
-  other: 'Other',
-};
-const CATEGORY_ORDER: SymptomCategory[] = ['physical', 'mood', 'skin_hair', 'metabolic', 'other'];
 const MOOD_LABEL: Record<Mood, string> = {
   great: 'Great',
   good: 'Good',
@@ -43,11 +36,13 @@ export default function LogScreen() {
     date ? s.periodDays.find((p) => p.date === date) : undefined,
   );
   const log = useCycleStore((s) => (date ? s.dayLogs[date] : undefined));
-  const symptoms = useCycleStore((s) => s.symptoms);
+  const symptoms = useCycleStore(selectActiveSymptoms);
+  const premium = useEntitlementsStore((s) => s.premium);
   const { setPeriodDay, removePeriodDay, saveDayLog, addCustomSymptom } = useCycleStore();
 
   const [notes, setNotes] = useState(log?.notes ?? '');
   const [custom, setCustom] = useState('');
+  const [customCategory, setCustomCategory] = useState<SymptomCategory>('other');
 
   const grouped = useMemo(() => {
     const map = new Map<SymptomCategory, typeof symptoms>();
@@ -101,7 +96,7 @@ export default function LogScreen() {
   const addCustom = async () => {
     const label = custom.trim();
     if (!label) return;
-    const s = await addCustomSymptom(repos, label, 'other');
+    const s = await addCustomSymptom(repos, label, premium ? customCategory : 'other');
     setCustom('');
     void saveDayLog(repos, { ...current, symptomIds: [...current.symptomIds, s.id] });
   };
@@ -183,6 +178,18 @@ export default function LogScreen() {
             disabled={!custom.trim()}
           />
         </View>
+        {premium ? (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm }}>
+            {CATEGORY_ORDER.map((c) => (
+              <Chip
+                key={c}
+                label={CATEGORY_LABEL[c]}
+                selected={customCategory === c}
+                onPress={() => setCustomCategory(c)}
+              />
+            ))}
+          </View>
+        ) : null}
       </Section>
 
       <Section title="Notes">

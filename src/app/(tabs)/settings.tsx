@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import { Alert, Linking, Switch, View } from 'react-native';
 
 import { DISCLAIMER_SHORT } from '@/content/copy';
+import { track } from '@/services/analytics';
 import { getRepos } from '@/services/bootstrap';
 import { deleteAllData, shareExport, type ExportFormat } from '@/services/export';
+import { shareDoctorReport } from '@/services/report';
 import { authenticate, getLockCapability, type LockCapability } from '@/services/lock/biometrics';
 import { getPermission, requestPermission } from '@/services/notifications';
 import { useEntitlementsStore, useLockStore, useSettingsStore } from '@/store';
@@ -21,7 +23,7 @@ export default function SettingsScreen() {
   const setLockEnabled = useLockStore((s) => s.setEnabled);
   const premium = useEntitlementsStore((s) => s.premium);
   const [capability, setCapability] = useState<LockCapability | null>(null);
-  const [busy, setBusy] = useState<ExportFormat | 'delete' | null>(null);
+  const [busy, setBusy] = useState<ExportFormat | 'delete' | 'report' | null>(null);
 
   useEffect(() => {
     getLockCapability()
@@ -79,6 +81,22 @@ export default function SettingsScreen() {
         Alert.alert('Sharing unavailable', 'This device cannot open a share sheet.');
     } catch (e) {
       Alert.alert('Export failed', e instanceof Error ? e.message : 'Please try again.');
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function report() {
+    if (!premium) {
+      track('paywall_viewed', { source: 'report' });
+      router.push('/paywall');
+      return;
+    }
+    setBusy('report');
+    try {
+      await shareDoctorReport(getRepos());
+    } catch (e) {
+      Alert.alert('Report failed', e instanceof Error ? e.message : 'Please try again.');
     } finally {
       setBusy(null);
     }
@@ -231,6 +249,18 @@ export default function SettingsScreen() {
                   onPress: () => router.push('/paywall'),
                   right: <Text color={colors.accent}>›</Text>,
                 })}
+          />
+          <Row
+            title={busy === 'report' ? 'Preparing…' : 'Doctor-ready report (PDF)'}
+            caption="Cycle history, symptoms by phase, and the last 90 days of logs."
+            onPress={() => void report()}
+            right={<Text color={colors.accent}>›</Text>}
+          />
+          <Row
+            title="Manage symptoms"
+            caption="Hide unused symptoms, organise custom ones."
+            onPress={() => router.push('/symptoms')}
+            right={<Text color={colors.accent}>›</Text>}
           />
           {__DEV__ ? (
             <Row
